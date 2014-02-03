@@ -1,0 +1,9 @@
+*.csv
+*.pdf
+*.tex
+*.aux
+*.toc
+*.log
+.project
+.pydevproject
+*.h5
