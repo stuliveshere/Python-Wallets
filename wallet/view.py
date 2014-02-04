@@ -3,6 +3,7 @@ from ttk import *
 import os
 
 class Tree(Frame):
+    '''directory tree browser'''
     def __init__(self, master, path):
         Frame.__init__(self, master)
         self.tree = Treeview(self)
@@ -33,44 +34,83 @@ class NewFile(Frame):
         self.v = StringVar()
         self.e = Entry(self, textvariable=self.v)
         self.e.pack(side=LEFT, expand=Y, fill=X)
-        self.buttonB = Button(self, text="create", command=self.createFile)
+        self.buttonB = Button(self, text="create")
         self.buttonB.pack(side=RIGHT,)
         self.pack(fill=X, expand=N, padx=5, pady=5)
         
-    def createFile(self):
-        open(self.v.get(), 'w')
+class W1(Frame):
+    def __init__(self, parent):
+        Frame.__init__(self, parent)
+        self.parent = parent
+        self.pack(fill=X, expand=N, padx=5, pady=5)
+        NewFile(self)
+        tree = Tree(self, path='../')
+        ButtonFrame = Frame(self)
+        ButtonFrame.pack(side=BOTTOM, fill=X)         
+        self.next = Button(ButtonFrame, text="Next >",)
+        self.next.pack(side=RIGHT, padx=5, pady=5)        
+        self.back = Button(ButtonFrame, text="< Back",state=DISABLED)
+        self.back.pack(side=RIGHT, padx=5, pady=5)
+        self.cancel = Button(ButtonFrame, text="Cancel",command=lambda: self.destroy()).pack(side=LEFT, padx=5, pady=5)
+        
+    
+class W2(Frame):
+    def __init__(self, parent):
+        Frame.__init__(self, parent)
+        self.parent = parent
+        self.pack(fill=X, expand=N, padx=5, pady=5)
+        ButtonFrame = Frame(self)
+        ButtonFrame.pack(side=BOTTOM, fill=X)         
+        self.next = Button(ButtonFrame, text="Next >",)
+        self.next.pack(side=RIGHT, padx=5, pady=5)        
+        self.back = Button(ButtonFrame, text="< Back")
+        self.back.pack(side=RIGHT, padx=5, pady=5)
+        self.cancel = Button(ButtonFrame, text="Cancel",command=lambda: self.destroy()).pack(side=LEFT, padx=5, pady=5)
 
+class W3(Frame):
+    def __init__(self, parent):
+        Frame.__init__(self, parent)
+        self.parent = parent
+        self.pack(fill=X, expand=N, padx=5, pady=5)
+        ButtonFrame = Frame(self)
+        ButtonFrame.pack(side=BOTTOM, fill=X)         
+        self.finish = Button(ButtonFrame, text="Finish",)
+        self.finish.pack(side=RIGHT, padx=5, pady=5)        
+        self.back = Button(ButtonFrame, text="< Back")
+        self.back.pack(side=RIGHT, padx=5, pady=5)
+        self.cancel = Button(ButtonFrame, text="Cancel",command=lambda: self.destroy()).pack(side=LEFT, padx=5, pady=5)
+
+        
 class WizardView(Toplevel):
+    '''top level view for new database wizard'''
     def __init__(self, parent):
         Toplevel.__init__(self, parent)
         self.title('New Database Wizard')
         self.geometry("400x600")
         self.frame = Frame(self)
         self.frame.pack(side=TOP, fill=BOTH, expand=Y)
-        notebook = Notebook(self.frame)
-        notebook.enable_traversal()
-        notebook.pack(fill='both', expand=Y, padx=5, pady=5)
+        self.notebook = Notebook(self.frame)
+        self.notebook.enable_traversal()
+        self.notebook.pack(fill='both', expand=Y, padx=5, pady=5)
 
-        f1 = Frame(notebook)
-        f1.pack()
-        p1 = notebook.add(f1)
-        #notebook.hide(0)
+        #three wizard pages:
+        #select statements for import (multiple files)
+        #select wallet definitions (multiple files)
+        #select database file
+        self.p1 = W1(self.frame)
+        self.notebook.add(self.p1)
+        self.p2 = W2(self.frame)
+        self.notebook.add(self.p2)
+        self.p3 = W3(self.frame)
+        self.notebook.add(self.p3)
+        #self.p2 = notebook.add(W2(notebook))
+        #self.p3 = notebook.add(W3(notebook))
 
-        MainFrame = Frame(f1, borderwidth=1)
-        MainFrame.pack(side=TOP, fill=BOTH, expand=Y)
-        
-        NewFile(MainFrame)
-        tree = Tree(MainFrame, path='../')
 
-        ButtonFrame = Frame(f1)
-        ButtonFrame.pack(side=BOTTOM, fill=X)         
-        Button(ButtonFrame, text="Next >",).pack(side=RIGHT, padx=5, pady=5)        
-        Button(ButtonFrame, text="< Back",state=DISABLED).pack(side=RIGHT, padx=5, pady=5)
-        Button(ButtonFrame, text="Cancel",command=lambda: self.destroy()).pack(side=LEFT, padx=5, pady=5)
         
 
 
-class View(Toplevel):
+class GuiView(Toplevel):
 
     def __init__(self, parent):
         Toplevel.__init__(self, parent)
