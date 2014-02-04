@@ -14,11 +14,6 @@ class Tree(Frame):
         abspath = os.path.abspath(path)
         root_node = self.tree.insert('', 'end', text=abspath, open=True)
         self.process_directory(root_node, abspath)
-        
-        
-        #self.tree.grid(row=0, column=0)
-        #ysb.grid(row=0, column=1, sticky='ns')
-        #xsb.grid(row=1, column=0, sticky='ew')
         self.tree.pack(fill='both', expand=Y, padx=5, pady=5)
         self.pack(fill='both', expand=Y, padx=5, pady=5)
 
@@ -38,15 +33,15 @@ class NewFile(Frame):
         self.v = StringVar()
         self.e = Entry(self, textvariable=self.v)
         self.e.pack(side=LEFT, expand=Y, fill=X)
-        self.buttonB = Button(self, text="create")
+        self.buttonB = Button(self, text="create", command=self.createFile)
         self.buttonB.pack(side=RIGHT,)
         self.pack(fill=X, expand=N, padx=5, pady=5)
+        
+    def createFile(self):
+        open(self.v.get(), 'w')
 
-class Wizard(Toplevel):
+class WizardView(Toplevel):
     def __init__(self, parent):
-        '''notebook with tabs disabled,
-        uses back/next/cancel buttons'''
-
         Toplevel.__init__(self, parent)
         self.title('New Database Wizard')
         self.geometry("400x600")
