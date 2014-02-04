@@ -1,3 +1,3 @@
 import wallet
 
-wallet.run()
+wallet.main()
