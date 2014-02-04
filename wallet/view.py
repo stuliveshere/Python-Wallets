@@ -38,7 +38,7 @@ class NewFile(Frame):
         self.buttonB.pack(side=RIGHT,)
         self.pack(fill=X, expand=N, padx=5, pady=5)
         
-class W1(Frame):
+class Wiz1(Frame):
     def __init__(self, parent):
         Frame.__init__(self, parent)
         self.parent = parent
@@ -54,7 +54,7 @@ class W1(Frame):
         self.cancel = Button(ButtonFrame, text="Cancel",command=lambda: self.destroy()).pack(side=LEFT, padx=5, pady=5)
         
     
-class W2(Frame):
+class Wiz2(Frame):
     def __init__(self, parent):
         Frame.__init__(self, parent)
         self.parent = parent
@@ -67,7 +67,7 @@ class W2(Frame):
         self.back.pack(side=RIGHT, padx=5, pady=5)
         self.cancel = Button(ButtonFrame, text="Cancel",command=lambda: self.destroy()).pack(side=LEFT, padx=5, pady=5)
 
-class W3(Frame):
+class Wiz3(Frame):
     def __init__(self, parent):
         Frame.__init__(self, parent)
         self.parent = parent
@@ -97,11 +97,11 @@ class WizardView(Toplevel):
         #select statements for import (multiple files)
         #select wallet definitions (multiple files)
         #select database file
-        self.p1 = W1(self.frame)
+        self.p1 = Wiz1(self.frame)
         self.notebook.add(self.p1)
-        self.p2 = W2(self.frame)
+        self.p2 = Wiz2(self.frame)
         self.notebook.add(self.p2)
-        self.p3 = W3(self.frame)
+        self.p3 = Wiz3(self.frame)
         self.notebook.add(self.p3)
         #self.p2 = notebook.add(W2(notebook))
         #self.p3 = notebook.add(W3(notebook))
