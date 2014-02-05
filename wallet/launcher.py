@@ -9,8 +9,6 @@ class Wizard(object):
         '''new project wizard controller'''
         self.parent = parent
         self.view = WizardView(self.parent)
-        #bindings
-        self.view.p1.next.config(command=lambda: self.view.notebook.select(1))
 
 
 class Gui(object):
