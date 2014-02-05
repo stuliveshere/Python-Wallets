@@ -1,6 +1,7 @@
 from Tkinter import *
 from ttk import *
 import os
+from wizard import Wizard
 
 class Tree(Frame):
     '''directory tree browser'''
@@ -87,27 +88,17 @@ class WizardView(Toplevel):
         Toplevel.__init__(self, parent)
         self.title('New Database Wizard')
         self.geometry("400x600")
-        self.frame = Frame(self)
-        self.frame.pack(side=TOP, fill=BOTH, expand=Y)
-        self.notebook = Notebook(self.frame)
-        self.notebook.enable_traversal()
-        self.notebook.pack(fill='both', expand=Y, padx=5, pady=5)
-
-        #three wizard pages:
-        #select statements for import (multiple files)
-        #select wallet definitions (multiple files)
-        #select database file
-        self.p1 = Wiz1(self.frame)
-        self.notebook.add(self.p1)
-        self.p2 = Wiz2(self.frame)
-        self.notebook.add(self.p2)
-        self.p3 = Wiz3(self.frame)
-        self.notebook.add(self.p3)
-        #self.p2 = notebook.add(W2(notebook))
-        #self.p3 = notebook.add(W3(notebook))
-
-
-        
+        frame = Frame(self)
+        frame.pack()
+        wizard = Wizard(master=frame, npages=3)
+        page0 = Label(wizard.page_container(0), text='Page 1')
+        page1 = Label(wizard.page_container(1), text='Page 2')
+        page2 = Label(wizard.page_container(2), text='Page 3')
+        wizard.add_page_body(page0)
+        wizard.add_page_body(page1)
+        wizard.add_page_body(page2)
+        wizard.pack(fill='both', expand=True)
+     
 
 
 class GuiView(Toplevel):
