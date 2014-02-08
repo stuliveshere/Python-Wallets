@@ -56,7 +56,8 @@ class Model():
         #self.model = Observables()
         
     def set_file(self, filename):
-        self.h5file = tb.openFile(filename, mode = "a", title=None)
+        #self.h5file = tb.openFile(filename, mode = "a", title=None)
+        print filename
         
 
     def set(self, data):

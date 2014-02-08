@@ -2,6 +2,7 @@ from Tkinter import *
 from tkFileDialog import *
 import sys
 from view import *
+from model import *
 #from model import *
 
 class Gui(object):
@@ -14,8 +15,8 @@ class Gui(object):
         self.view.fileMenu.entryconfig(1, command=self.new)
         self.view.fileMenu.entryconfig(9, command=self.quit)
         self.view.toolMenu.entryconfig(1, command=self.import_statements)
-        
         #model
+        self.model = Model()
         
 
     def quit(self):
@@ -23,8 +24,7 @@ class Gui(object):
         
     def new(self):
         '''new database wizard'''
-        filename = None
-        db = WizardView(self.parent, filename)
+        db = WizardView(self.parent, self.model.set_file)
         
         #if self.v: self.h5file = tb.openFile(self.v.get(), mode = "w", title='db')
         

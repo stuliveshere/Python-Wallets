@@ -110,7 +110,8 @@ class NewFile(Frame):
        
 class WizardView(Toplevel):
     '''top level view for new database wizard'''
-    def __init__(self, parent, filename):
+    def __init__(self, parent, callback):
+        self.callback = callback
         Toplevel.__init__(self, parent)
         self.title('New Database Wizard')
         self.geometry("400x600")
@@ -122,10 +123,11 @@ class WizardView(Toplevel):
         self.pagelist.append(Tree(wizard.page_container(0), '../'))
         for page in self.pagelist: wizard.add_page_body(page)
         wizard.pack(fill='both', expand=True)
-    
-    def __del__(self):
-        print 'et'
-        return self.pagelist[1].v.get()
+        
+    def exit(self):
+        print 'stuff'
+        self.callback(self.pagelist[1].v.get())
+
 
 class GuiView(Toplevel):
 
