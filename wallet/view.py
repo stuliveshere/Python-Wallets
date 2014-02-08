@@ -1,6 +1,7 @@
 from Tkinter import *
 from ttk import *
 import os
+import tables as tb
 
 class Wizard(object,Notebook):
     ''' from https://code.google.com/p/python-ttk/wiki/ttkWizard'''
@@ -101,33 +102,30 @@ class NewFile(Frame):
         self.v = StringVar()
         self.e = Entry(self, textvariable=self.v)
         self.e.pack(side=LEFT, expand=Y, fill=X)
-        self.buttonB = Button(self, text="create")
+        self.buttonB = Button(self, text="create",)
         self.buttonB.pack(side=RIGHT,)
         self.pack(fill=X, expand=N, padx=5, pady=5)
+    
         
        
 class WizardView(Toplevel):
     '''top level view for new database wizard'''
-    def __init__(self, parent):
+    def __init__(self, parent, filename):
         Toplevel.__init__(self, parent)
         self.title('New Database Wizard')
         self.geometry("400x600")
-        wizard = Wizard(master=self, npages=3)
-        #page 0 - select new database
-        page0 = Label(wizard.page_container(0), text='Page 1')
-        page0.pack(side=TOP)
-        create = NewFile(wizard.page_container(0))
-        tree = Tree(wizard.page_container(0), '../')
-        page1 = Label(wizard.page_container(1), text='Page 2')
-        page2 = Label(wizard.page_container(2), text='Page 3')
-        wizard.add_page_body(page0)
-        wizard.add_page_body(create)
-        wizard.add_page_body(tree)
-        wizard.add_page_body(page1)
-        wizard.add_page_body(page2)
+        wizard = Wizard(master=self, npages=2)
+        self.pagelist = []
+        self.pagelist.append(Label(wizard.page_container(0), text='Create new database file'))
+        self.pagelist[0].pack(side=TOP)
+        self.pagelist.append(NewFile(wizard.page_container(0)))
+        self.pagelist.append(Tree(wizard.page_container(0), '../'))
+        for page in self.pagelist: wizard.add_page_body(page)
         wizard.pack(fill='both', expand=True)
-     
-
+    
+    def __del__(self):
+        print 'et'
+        return self.pagelist[1].v.get()
 
 class GuiView(Toplevel):
 
@@ -163,7 +161,7 @@ class GuiView(Toplevel):
         self.fileMenu.add_command(label="Quit")
         self.toolMenu = Menu(self.menuBar)
         self.menuBar.add_cascade(label="Tools", menu=self.toolMenu)
-        self.toolMenu.add_command(label="template")
+        self.toolMenu.add_command(label="Import statements...")
         self.helpMenu = Menu(self.menuBar)
         self.menuBar.add_cascade(label="Help", menu=self.helpMenu)
         self.helpMenu.add_command(label="About")
