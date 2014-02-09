@@ -30,8 +30,9 @@ class Gui(object):
         
     def new1(self):
         
-        print self.view.pagelist[1].v.get()
+        filename = self.view.pagelist[1].v.get()
         self.view.wroot.destroy()
+        self.model.set_file(filename)
         
         
         #if self.v: self.h5file = tb.openFile(self.v.get(), mode = "w", title='db')
