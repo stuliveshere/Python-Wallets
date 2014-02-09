@@ -24,16 +24,17 @@ class Wizard(object,Notebook):
         for indx, child in self._children.iteritems():
             btnframe = Frame(child)
             btnframe.pack(side='bottom', fill='x', padx=6, pady=12)
-
+            self.buttonlist = []
             nextbtn = Button(btnframe, text="Next", command=self.next_page)
             nextbtn.pack(side='right', anchor='e', padx=6)
+            self.buttonlist.append(nextbtn)
             if indx != 0:
                 prevbtn = Button(btnframe, text="Previous",
                     command=self.prev_page)
                 prevbtn.pack(side='right', anchor='e', padx=6)
 
                 if indx == len(self._children) - 1:
-                    nextbtn.configure(text="Finish", command=self.close)
+                    nextbtn.configure(text="Finish")
 
     def next_page(self):
         self.current += 1
@@ -42,7 +43,7 @@ class Wizard(object,Notebook):
         self.current -= 1
 
     def close(self):
-        self.master.destroy()
+        self.destroy()
 
     def add_empty_page(self):
         child = Frame(self)
@@ -105,29 +106,7 @@ class NewFile(Frame):
         self.buttonB = Button(self, text="create",)
         self.buttonB.pack(side=RIGHT,)
         self.pack(fill=X, expand=N, padx=5, pady=5)
-    
         
-       
-class WizardView(Toplevel):
-    '''top level view for new database wizard'''
-    def __init__(self, parent, callback):
-        self.callback = callback
-        Toplevel.__init__(self, parent)
-        self.title('New Database Wizard')
-        self.geometry("400x600")
-        wizard = Wizard(master=self, npages=2)
-        self.pagelist = []
-        self.pagelist.append(Label(wizard.page_container(0), text='Create new database file'))
-        self.pagelist[0].pack(side=TOP)
-        self.pagelist.append(NewFile(wizard.page_container(0)))
-        self.pagelist.append(Tree(wizard.page_container(0), '../'))
-        for page in self.pagelist: wizard.add_page_body(page)
-        wizard.pack(fill='both', expand=True)
-        
-    def exit(self):
-        print 'stuff'
-        self.callback(self.pagelist[1].v.get())
-
 
 class GuiView(Toplevel):
 
@@ -168,6 +147,20 @@ class GuiView(Toplevel):
         self.menuBar.add_cascade(label="Help", menu=self.helpMenu)
         self.helpMenu.add_command(label="About")
 
+    def new_db_wizard(self):
+        '''top level view for new database wizard'''
+        self.wroot = Toplevel()
+        self.wroot.title('New Database Wizard')
+        self.wroot.geometry("400x600")
+        self.wizard = Wizard(master=self.wroot, npages=2)
+        self.pagelist = []
+        self.pagelist.append(Label(self.wizard.page_container(0), text='Create new database file'))
+        self.pagelist[0].pack(side=TOP)
+        self.pagelist.append(NewFile(self.wizard.page_container(0)))
+        self.pagelist.append(Tree(self.wizard.page_container(0), '../'))
+        for page in self.pagelist: self.wizard.add_page_body(page)
+        self.wizard.pack(fill='both', expand=True)
+    
 
 class View_Config():
     def __init__(self, parent):

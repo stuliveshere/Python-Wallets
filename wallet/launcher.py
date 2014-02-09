@@ -15,6 +15,7 @@ class Gui(object):
         self.view.fileMenu.entryconfig(1, command=self.new)
         self.view.fileMenu.entryconfig(9, command=self.quit)
         self.view.toolMenu.entryconfig(1, command=self.import_statements)
+        
         #model
         self.model = Model()
         
@@ -23,8 +24,15 @@ class Gui(object):
         sys.exit()
         
     def new(self):
-        '''new database wizard'''
-        db = WizardView(self.parent, self.model.set_file)
+        '''new database'''
+        wizard = self.view.new_db_wizard()
+        self.view.wizard.buttonlist[-1].configure(command=self.new1)
+        
+    def new1(self):
+        
+        print self.view.pagelist[1].v.get()
+        self.view.wroot.destroy()
+        
         
         #if self.v: self.h5file = tb.openFile(self.v.get(), mode = "w", title='db')
         
