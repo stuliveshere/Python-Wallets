@@ -7,3 +7,4 @@
 .project
 .pydevproject
 *.h5
+*.pyc
