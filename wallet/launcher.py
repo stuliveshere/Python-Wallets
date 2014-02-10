@@ -35,11 +35,13 @@ class Gui(object):
         if selection[-3:] == '.h5': 
             print self.view.pagelist[2].tree.item(thing)
             print parent
+            #need to generate full file path
             self.view.wizard.buttonlist[0].configure(state=ACTIVE)
         
     def model_init(self):
         filename = self.view.pagelist[1].v.get()
         self.view.wroot.destroy()
+        self.store = pd.HDFStore(store)
         self.model = Model(filename)
         
     def import_statements(self):

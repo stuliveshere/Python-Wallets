@@ -56,9 +56,8 @@ class Model():
     '''
     
     def __init__(self, store):
-        self.store = pd.HDFStore(store)
         self.model = Observables()
-
+        
     def set(self, data):
         self.model.set(data)
 
