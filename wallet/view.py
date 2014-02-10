@@ -21,11 +21,11 @@ class Wizard(object,Notebook):
 
     def _wizard_buttons(self):
         """Place wizard buttons in the pages."""
+        self.buttonlist = []
         for indx, child in self._children.iteritems():
             btnframe = Frame(child)
             btnframe.pack(side='bottom', fill='x', padx=6, pady=12)
-            self.buttonlist = []
-            nextbtn = Button(btnframe, text="Next", command=self.next_page)
+            nextbtn = Button(btnframe, text="Next", command=self.next_page, state=DISABLED)
             nextbtn.pack(side='right', anchor='e', padx=6)
             self.buttonlist.append(nextbtn)
             if indx != 0:
@@ -80,7 +80,6 @@ class Tree(Frame):
         xsb = Scrollbar(self, orient='horizontal', command=self.tree.xview)
         self.tree.configure(yscroll=ysb.set, xscroll=xsb.set)
         self.tree.heading('#0', text='Select New Database', anchor='center')
-
         abspath = os.path.abspath(path)
         root_node = self.tree.insert('', 'end', text=abspath, open=True)
         self.process_directory(root_node, abspath)

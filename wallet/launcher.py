@@ -16,8 +16,6 @@ class Gui(object):
         self.view.fileMenu.entryconfig(9, command=self.quit)
         self.view.toolMenu.entryconfig(1, command=self.import_statements)
         
-        #model
-        self.model = Model()
         
 
     def quit(self):
@@ -26,16 +24,23 @@ class Gui(object):
     def new(self):
         '''new database'''
         wizard = self.view.new_db_wizard()
-        self.view.wizard.buttonlist[-1].configure(command=self.new1)
+        self.view.wizard.buttonlist[-1].configure(command=self.model_init)
+        self.view.pagelist[2].tree.bind('<<TreeviewSelect>>', self.onClick)
         
-    def new1(self):
+    def onClick(self, event):
+        thing =  self.view.pagelist[2].tree.selection()
+        selection = self.view.pagelist[2].tree.item(thing)['text']
+        parent = self.view.pagelist[2].tree.parent(thing)
+        dir = self.view.pagelist[2].tree.item(parent)
+        if selection[-3:] == '.h5': 
+            print self.view.pagelist[2].tree.item(thing)
+            print parent
+            self.view.wizard.buttonlist[0].configure(state=ACTIVE)
         
+    def model_init(self):
         filename = self.view.pagelist[1].v.get()
         self.view.wroot.destroy()
-        self.model.set_file(filename)
-        
-        
-        #if self.v: self.h5file = tb.openFile(self.v.get(), mode = "w", title='db')
+        self.model = Model(filename)
         
     def import_statements(self):
         options = {

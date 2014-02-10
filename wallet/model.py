@@ -1,9 +1,12 @@
 import tables as tb
+import pandas as pd
 
 class Observables():
 
     def __init__(self):
-        self.data = {}
+        columns = ['data','amount', 'desc', 'account']
+        index = None
+        self.data = pd.DataFrame(index=index, columns=columns)
         self.callbacks = {}
 
     def addCallback(self, func):
@@ -51,14 +54,10 @@ class Model():
     ''' model is a dictionary of dictionaries.
     ie node dictionary contains a dictionary of parameters for each node
     '''
-    def __init__(self):
-        pass
-        #self.model = Observables()
-        
-    def set_file(self, filename):
-        #self.h5file = tb.openFile(filename, mode = "a", title=None)
-        print filename
-        
+    
+    def __init__(self, store):
+        self.store = pd.HDFStore(store)
+        self.model = Observables()
 
     def set(self, data):
         self.model.set(data)
