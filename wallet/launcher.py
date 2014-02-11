@@ -3,7 +3,6 @@ from tkFileDialog import *
 import sys
 from view import *
 from model import *
-#from model import *
 
 class Gui(object):
     ''' main gui controller'''
@@ -15,8 +14,8 @@ class Gui(object):
         self.view.fileMenu.entryconfig(1, command=self.new)
         self.view.fileMenu.entryconfig(9, command=self.quit)
         self.view.toolMenu.entryconfig(1, command=self.import_statements)
-        
-        
+        #model
+        self.model = Model()
 
     def quit(self):
         sys.exit()
@@ -25,9 +24,9 @@ class Gui(object):
         '''new database'''
         wizard = self.view.new_db_wizard()
         self.view.wizard.buttonlist[-1].configure(command=self.model_init)
-        self.view.pagelist[2].tree.bind('<<TreeviewSelect>>', self.onClick)
+        self.view.pagelist[2].tree.bind('<<TreeviewSelect>>', self.onSelect)
         
-    def onClick(self, event):
+    def onSelect(self, event):
         thing =  self.view.pagelist[2].tree.selection()
         selection = self.view.pagelist[2].tree.item(thing)['text']
         parent = self.view.pagelist[2].tree.parent(thing)
@@ -37,12 +36,12 @@ class Gui(object):
             print parent
             #need to generate full file path
             self.view.wizard.buttonlist[0].configure(state=ACTIVE)
-        
+
     def model_init(self):
-        filename = self.view.pagelist[1].v.get()
+        store = self.view.pagelist[1].v.get()
         self.view.wroot.destroy()
         self.store = pd.HDFStore(store)
-        self.model = Model(filename)
+        
         
     def import_statements(self):
         options = {

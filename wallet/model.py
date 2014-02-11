@@ -55,7 +55,7 @@ class Model():
     ie node dictionary contains a dictionary of parameters for each node
     '''
     
-    def __init__(self, store):
+    def __init__(self):
         self.model = Observables()
         
     def set(self, data):
