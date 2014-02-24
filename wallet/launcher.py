@@ -27,15 +27,13 @@ class Gui(object):
         self.view.fileMenu.entryconfig(2, command=self.open)
         self.view.fileMenu.entryconfig(9, command=self.quit)
         self.view.toolMenu.entryconfig(1, command=self.import_statements)
-        self.view.toolMenu.entryconfig(2, command=self.import_accounts)
-        self.view.toolMenu.entryconfig(3, command=self.editAccounts)
-        self.view.toolMenu.entryconfig(4, command=self.editWallets)
+        self.view.toolMenu.entryconfig(2, command=self.editAccounts)
+        self.view.toolMenu.entryconfig(3, command=self.editWallets)
         #model
         self.h5db = None
         self.Data = Model(columns=['data', 'amount', 'desc', 'account', 'wallet'])
         self.Accounts = Model(columns=['account', 'desc'])
-        self.Wallets = Model(columns=['wallet', 'desc'])
-        self.WalletKeys = Model(columns=['keyword', 'wallet', 'desc'])
+        self.Wallets = Model(columns=['wallet', 'keys'])
         #add callbacks
         self.Accounts.model.addCallback(self.logger)
         
@@ -80,7 +78,7 @@ class Gui(object):
         }
         self.h5db = askopenfilename(**options)
         store = pd.HDFStore(self.h5db)
-        print store['wallets']
+
               
     def model_open(self):
         pass
@@ -96,7 +94,7 @@ class Gui(object):
         'title': 'select statement file'
         }
         filelist=askopenfilenames(**options)
-        print filelist
+        for file in filelist: View_import(file, self.Accounts)
         
     def import_accounts(self):
         options = {
@@ -125,11 +123,9 @@ class Gui(object):
         }
         filelist=askopenfilenames(**options)
         walletlist = [a.split('/')[-1].split('.')[0] for a in filelist]
-        wallet_desc = [None]*len(walletlist)
-        df = pd.DataFrame(data = zip(walletlist, wallet_desc), columns=['wallet', 'desc'])
+        keys = [open(a, 'r').read().split() for a in filelist]
+        df = pd.DataFrame(data = zip(walletlist, keys), columns=['wallet', 'keys'])
         self.Wallets.set(df)
-    
-        
 
 
     def editAccounts(self):

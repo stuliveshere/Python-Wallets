@@ -123,7 +123,6 @@ class GuiView(Toplevel):
         self.toolMenu = Menu(self.menuBar)
         self.menuBar.add_cascade(label="Tools", menu=self.toolMenu)
         self.toolMenu.add_command(label="Import statements...")
-        self.toolMenu.add_command(label="Import accounts...")
         self.toolMenu.add_command(label="Edit accounts...")
         self.toolMenu.add_command(label="Edit wallets...")
         self.helpMenu = Menu(self.menuBar)
@@ -144,6 +143,26 @@ class View_Log():
         self.view = parent.add(self.frame, text='Log')
         self.text_box = Text(self.frame, wrap='word')
         self.text_box.pack(fill='both', expand=Y, padx=5, pady=5)
+
+class View_import(Toplevel):
+    def __init__(self, _file, account):
+        Toplevel.__init__(self)
+        self.title('Import Bank Statement')
+        self.geometry("800x600")
+        self.topframe = Frame(self)
+        self.topframe.pack(side=TOP, fill=BOTH, expand=Y)
+        self.baseframe = Frame(self)
+        self.baseframe.pack(side=BOTTOM, fill=X, expand=Y)
+        self.text_box = Text(self.topframe, wrap='word')
+        self.text_box.pack(fill='both', expand=Y, padx=5, pady=5)
+        self.importButton = Button(self.baseframe, text='Import...')
+        self.importButton.pack(side=RIGHT)
+        self.box_value = StringVar()
+        self.box = Combobox(self.baseframe, textvariable=self.box_value, 
+                                state='readonly')
+        self.box['values'] = account.get()
+        self.box.current(0)
+        self.box.pack(side=RIGHT)
 
 
 class View_table(object):
