@@ -42,18 +42,12 @@ class Observables():
 
     def set(self, data):
         '''
-        data is a dictionary of sub-dictionary
-        if sub-dictionary exists, update values
-        in sub-dictionary, else create sub-
-        dictionary.
+        no duplicate removal.  
+        appends dataframe
         '''
-        for key in data.keys():
-            if key in self.data.keys():
-                for subkey in data[key]:
-                    self.data[key][subkey] = data[key][subkey]
-            else:
-                self.data[key] = data[key]
+        self.data = self.data.append(data, ignore_index=True)
         self._docallbacks()
+        
 
     def remove(self, key):
         del self.data[key]

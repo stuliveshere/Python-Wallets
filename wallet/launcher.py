@@ -27,18 +27,26 @@ class Gui(object):
         self.view.fileMenu.entryconfig(2, command=self.open)
         self.view.fileMenu.entryconfig(9, command=self.quit)
         self.view.toolMenu.entryconfig(1, command=self.import_statements)
-        self.view.toolMenu.entryconfig(2, command=self.editAccounts)
-        self.view.toolMenu.entryconfig(3, command=self.editWallets)
+        self.view.toolMenu.entryconfig(2, command=self.import_accounts)
+        self.view.toolMenu.entryconfig(3, command=self.editAccounts)
+        self.view.toolMenu.entryconfig(4, command=self.editWallets)
         #model
+        self.h5db = None
         self.Data = Model(columns=['data', 'amount', 'desc', 'account', 'wallet'])
         self.Accounts = Model(columns=['account', 'desc'])
         self.Wallets = Model(columns=['wallet', 'desc'])
         self.WalletKeys = Model(columns=['keyword', 'wallet', 'desc'])
+        #add callbacks
+        self.Accounts.model.addCallback(self.logger)
         
+    
+    def logger(self, event):
+        print event
+        #print self.Accounts.model.data
 
     def quit(self):
         sys.exit()
-        
+
     def new(self):
         ''' 
         create new db.  gets filename and 
@@ -52,13 +60,10 @@ class Gui(object):
         'parent':self.view, 
         'title':'Select new db file',
         }
-        self.db_name = asksaveasfilename(**options)
-        print 'creating ', self.db_name
-        self.store = pd.HDFStore(self.db_name)
-    
-    def create_accounts(self):
-        pass
-    
+        self.h5db = asksaveasfilename(**options)
+        self.import_accounts()
+        self.import_wallets()
+        self.save()
 
     def open(self):
         ''' 
@@ -73,32 +78,70 @@ class Gui(object):
         'parent':self.view, 
         'title':'Select new db file',
         }
-        self.db_name = askopenfilename(**options)
-        self.model_open()       
- 
+        self.h5db = askopenfilename(**options)
+        store = pd.HDFStore(self.h5db)
+        print store['wallets']
+              
     def model_open(self):
         pass
-        
-        
+
     def import_statements(self):
         options = {
-        'defaultextension':'.csv', 
-        'filetypes':[('csv', '.csv')], 
-        'initialdir':'../', 
-        'initialfile':None, 
-        'multiple':1, 
-        'parent':self.parent, 
-        'title':'select statement file',        
+        'defaultextension': '.csv',
+        'filetypes': [('csv', '.csv')],
+        'initialdir': '../',
+        'initialfile': None,
+        'multiple': 1,
+        'parent': self.parent,
+        'title': 'select statement file'
         }
-        filelist = askopenfilenames(**options)
+        filelist=askopenfilenames(**options)
+        print filelist
+        
+    def import_accounts(self):
+        options = {
+        'defaultextension': '.csv',
+        'filetypes': [('csv', '.csv')],
+        'initialdir': '../',
+        'initialfile': None,
+        'multiple': 0,
+        'parent': self.parent,
+        'title': 'select accounts definitions'
+        }
+        filename=askopenfilename(**options)
+        account_data = pd.read_csv(filename, header=None)
+        account_data.columns = ['account', 'desc']
+        self.Accounts.set(account_data)
+        
+    def import_wallets(self):
+        options = {
+        'defaultextension': '.csv',
+        'filetypes': [('csv', '.csv')],
+        'initialdir': '../',
+        'initialfile': None,
+        'multiple': 1,
+        'parent': self.parent,
+        'title': 'import wallets'
+        }
+        filelist=askopenfilenames(**options)
+        walletlist = [a.split('/')[-1].split('.')[0] for a in filelist]
+        wallet_desc = [None]*len(walletlist)
+        df = pd.DataFrame(data = zip(walletlist, wallet_desc), columns=['wallet', 'desc'])
+        self.Wallets.set(df)
     
+        
+
+
     def editAccounts(self):
         View_table(self.Accounts)
     
     def editWallets(self):
         pass
-    
 
+    def save(self):
+        store = pd.HDFStore(self.h5db)
+        store['accounts'] = self.Accounts.model.data
+        store['wallets'] = self.Wallets.model.data
 
 
 def main():

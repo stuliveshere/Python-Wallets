@@ -123,6 +123,7 @@ class GuiView(Toplevel):
         self.toolMenu = Menu(self.menuBar)
         self.menuBar.add_cascade(label="Tools", menu=self.toolMenu)
         self.toolMenu.add_command(label="Import statements...")
+        self.toolMenu.add_command(label="Import accounts...")
         self.toolMenu.add_command(label="Edit accounts...")
         self.toolMenu.add_command(label="Edit wallets...")
         self.helpMenu = Menu(self.menuBar)
