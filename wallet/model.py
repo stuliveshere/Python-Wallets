@@ -1,10 +1,31 @@
-import tables as tb
+#pandas tables include:
+#    data table - table with all bank data
+#        columns include:
+#            - date
+#            - amount
+#            - description
+#            - account
+#            - wallet
+#    accounts table - table of accounts
+#        columns include:
+#            - account name
+#            - account description
+#    wallets table - table of wallets
+#        columns include:
+#            - wallets name
+#            - wallets description
+#    wallets description - table of wallets
+#        columns include:
+#            - keyword
+#            - description
+#            - wallet
+
 import pandas as pd
+
 
 class Observables():
 
-    def __init__(self):
-        columns = ['data','amount', 'desc', 'account']
+    def __init__(self, columns):
         index = None
         self.data = pd.DataFrame(index=index, columns=columns)
         self.callbacks = {}
@@ -38,7 +59,6 @@ class Observables():
         del self.data[key]
         self._docallbacks()
 
-
     def get(self, key, subkey=None):
         if subkey:
             return self.data[key][subkey]
@@ -49,14 +69,16 @@ class Observables():
 
     def unset(self):
         self.data = {}
-        
+
+
 class Model():
     ''' model is a dictionary of dictionaries.
     ie node dictionary contains a dictionary of parameters for each node
     '''
     
-    def __init__(self):
-        self.model = Observables()
+    def __init__(self, columns):
+        self.columns = columns
+        self.model = Observables(columns)
         
     def set(self, data):
         self.model.set(data)

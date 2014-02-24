@@ -27,8 +27,14 @@ class Gui(object):
         self.view.fileMenu.entryconfig(2, command=self.open)
         self.view.fileMenu.entryconfig(9, command=self.quit)
         self.view.toolMenu.entryconfig(1, command=self.import_statements)
+        self.view.toolMenu.entryconfig(2, command=self.editAccounts)
+        self.view.toolMenu.entryconfig(3, command=self.editWallets)
         #model
-        self.model = Model()
+        self.Data = Model(columns=['data', 'amount', 'desc', 'account', 'wallet'])
+        self.Accounts = Model(columns=['account', 'desc'])
+        self.Wallets = Model(columns=['wallet', 'desc'])
+        self.WalletKeys = Model(columns=['keyword', 'wallet', 'desc'])
+        
 
     def quit(self):
         sys.exit()
@@ -48,10 +54,11 @@ class Gui(object):
         }
         self.db_name = asksaveasfilename(**options)
         print 'creating ', self.db_name
-        self.model_new()
-
-    def model_new(self):
         self.store = pd.HDFStore(self.db_name)
+    
+    def create_accounts(self):
+        pass
+    
 
     def open(self):
         ''' 
@@ -84,6 +91,12 @@ class Gui(object):
         'title':'select statement file',        
         }
         filelist = askopenfilenames(**options)
+    
+    def editAccounts(self):
+        View_table(self.Accounts)
+    
+    def editWallets(self):
+        pass
     
 
 
