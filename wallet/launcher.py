@@ -37,10 +37,17 @@ class Gui(object):
         #add callbacks
         self.Accounts.model.addCallback(self.logger)
         self.Wallets.model.addCallback(self.logger)
+        self.Accounts.model.addCallback(self.unsaved)
+        self.Wallets.model.addCallback(self.unsaved)
+        self.Data.model.addCallback(self.unsaved)
     
     def logger(self, event):
         print event
         #print self.Accounts.model.data
+        
+    def unsaved(self):
+        #put asterix in title to show not saved
+        self.view.title('Python-Wallets (**unsaved)')
 
     def quit(self):
         sys.exit()
@@ -61,7 +68,6 @@ class Gui(object):
         self.h5db = asksaveasfilename(**options)
         self.import_accounts()
         self.import_wallets()
-        self.save()
 
     def open(self):
         ''' 
@@ -80,6 +86,7 @@ class Gui(object):
         store = pd.HDFStore(self.h5db)
         self.Accounts.set(store['accounts']) 
         self.Wallets.set(store['wallets'])
+        self.Data.set(store['data'])
         
 
     def process_statement(self):
@@ -92,17 +99,32 @@ class Gui(object):
         options = {
         'defaultextension': '.csv',
         'filetypes': [('csv', '.csv')],
-        'initialdir': '../',
+        'initialdir': '../data/statements/',
         'initialfile': None,
         'multiple': 1,
         'parent': self.parent,
         'title': 'select statement file'
         }
         filelist=askopenfilenames(**options)
+        accountlist = list(self.Accounts.model.data['account'].values)
+        #for each file
         for _file in filelist:
-            handle = open(_file, 'r')
-            self.importer = View_import(_file, self.Accounts)
-            self.importer.importButton.config(command=self.process_statement)
+            #parse filename to find out the account
+            accountname =  accountlist[[i for i, x in enumerate(accountlist) if x in _file][0]]
+            #read in csv to dataframe
+            _data = pd.read_csv(_file, header=None, names=['data', 'amount', 'desc', 'null'])
+            _data['account'] = accountname
+            _data = _data.drop('null', 1)
+            self.Data.set(_data)
+            
+            
+            
+        #append account to new column
+        #append dataframe to Data
+        #run duplicate removal tool
+        #run wallet parser
+
+        
             
 
     def import_accounts(self):
@@ -132,7 +154,7 @@ class Gui(object):
         }
         filelist=askopenfilenames(**options)
         walletlist = [a.split('/')[-1].split('.')[0] for a in filelist]
-        keys = [open(a, 'r').read().split() for a in filelist]
+        keys = [open(a, 'r').read().split('\n') for a in filelist]
         df = pd.DataFrame(data = zip(walletlist, keys), columns=['wallet', 'keys'])
         self.Wallets.set(df)
 
@@ -147,7 +169,8 @@ class Gui(object):
         store = pd.HDFStore(self.h5db)
         store['accounts'] = self.Accounts.model.data
         store['wallets'] = self.Wallets.model.data
-
+        store['data'] = self.Data.model.data
+        self.view.title('Python-Wallets')
 
 def main():
     root = Tk()
