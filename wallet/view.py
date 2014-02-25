@@ -103,8 +103,9 @@ class GuiView(Toplevel):
         notebook = Notebook(self.frame)
         notebook.enable_traversal()  
         notebook.pack(fill='both', expand=Y, padx=5, pady=5)
-        View_Config(notebook)
         self.log = View_Log(notebook)
+        View_Config(notebook)
+        
 
     def _menu(self):
         self.menuBar = Menu(self)
@@ -147,20 +148,22 @@ class View_Log():
 class View_import(Toplevel):
     def __init__(self, _file, account):
         Toplevel.__init__(self)
-        self.title('Import Bank Statement')
+        self.title(_file)
         self.geometry("800x600")
+        handle = open(_file, 'r')
         self.topframe = Frame(self)
         self.topframe.pack(side=TOP, fill=BOTH, expand=Y)
         self.baseframe = Frame(self)
         self.baseframe.pack(side=BOTTOM, fill=X, expand=Y)
         self.text_box = Text(self.topframe, wrap='word')
+        self.text_box.insert('end', handle.read())
         self.text_box.pack(fill='both', expand=Y, padx=5, pady=5)
         self.importButton = Button(self.baseframe, text='Import...')
         self.importButton.pack(side=RIGHT)
         self.box_value = StringVar()
         self.box = Combobox(self.baseframe, textvariable=self.box_value, 
                                 state='readonly')
-        self.box['values'] = account.get()
+        self.box['values'] = list(account.model.data['account'].values)
         self.box.current(0)
         self.box.pack(side=RIGHT)
 

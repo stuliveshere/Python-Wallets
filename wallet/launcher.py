@@ -36,7 +36,7 @@ class Gui(object):
         self.Wallets = Model(columns=['wallet', 'keys'])
         #add callbacks
         self.Accounts.model.addCallback(self.logger)
-        
+        self.Wallets.model.addCallback(self.logger)
     
     def logger(self, event):
         print event
@@ -78,8 +78,13 @@ class Gui(object):
         }
         self.h5db = askopenfilename(**options)
         store = pd.HDFStore(self.h5db)
+        self.Accounts.set(store['accounts']) 
+        self.Wallets.set(store['wallets'])
+        
 
-              
+    def process_statement(self):
+        print 'do iiiiit'   
+                   
     def model_open(self):
         pass
 
@@ -94,8 +99,12 @@ class Gui(object):
         'title': 'select statement file'
         }
         filelist=askopenfilenames(**options)
-        for file in filelist: View_import(file, self.Accounts)
-        
+        for _file in filelist:
+            handle = open(_file, 'r')
+            self.importer = View_import(_file, self.Accounts)
+            self.importer.importButton.config(command=self.process_statement)
+            
+
     def import_accounts(self):
         options = {
         'defaultextension': '.csv',
