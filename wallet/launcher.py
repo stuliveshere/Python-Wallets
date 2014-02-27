@@ -198,11 +198,13 @@ class Gui(object):
             reg = '|'.join(keys)
             bools =  self.Data.model.data.desc.str.contains(reg)
             self.Data.model.data['wallet'][bools] = row['wallet']
+        self.Data.model.data = self.Data.model.data.sort(columns=['date'], ascending=False)
         self.save()
         
+        print self.Data.model.data.head(20)
         for key, grp in self.Data.model.data.groupby(['wallet']):
             rows = np.random.choice(grp.index.values, 20)
-            print grp.ix[rows].drop_duplicates()
+            #print grp.ix[rows].drop_duplicates()
 
 
     

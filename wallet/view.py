@@ -145,18 +145,35 @@ class View_Summary():
         self.parent = parent
         self.frame = Frame(parent)
         self.view = parent.add(self.frame, text='Summary')
-        self.f = pylab.figure(figsize=(10,8), dpi=100)
-        self.a = self.f.add_subplot(111)
-        self.canvas = Tkcanvas(self.f, master=self.frame)
+        self.fig = pylab.figure(figsize=(10,8), dpi=100)
+        self.axes = {'veridian':self.fig.add_subplot(411),
+                     'mastercard':self.fig.add_subplot(412),
+                     'visa':self.fig.add_subplot(413),
+                     'savings':self.fig.add_subplot(414),}
+        self.canvas = Tkcanvas(self.fig, master=self.frame)
         self.canvas.get_tk_widget().pack(side=TOP, fill=BOTH, expand=1)
 
 
     def draw(self, dataset):
-        
-        t = np.arange(0.0,3.0,0.01)
-        s = np.sin(2*np.pi*t)
-        self.a.plot(t,s)
-        self.f.tight_layout()
+        for key in self.axes.keys():
+            
+            f = dataset[dataset.account == key]
+            f = f.set_index(keys='date')
+            f = f['2013-07-01':'2014-2-28']
+            f = f.amount
+            f.columns = ['amount']
+            rng = pd.date_range(start='2013-07-01', end='2014-2-28', freq='D')
+            df = pd.DataFrame(pd.Series(0, index=rng), index=rng)
+            df.columns = ['amount']
+            #df = df.set_index(keys='date')
+            print df.head()
+            print f.head()
+            df = df.append(f)
+            df = df.groupby(df.index).sum()
+            df = df.cumsum()
+            print df.head()
+            #df['2013-01-31':'2014-01-31'].plot(ax=self.axes[key], title=key)
+        self.fig.tight_layout()
         self.canvas.show()
         
 class View_Log():
