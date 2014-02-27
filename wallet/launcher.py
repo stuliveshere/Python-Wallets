@@ -25,6 +25,7 @@ class Gui(object):
         #bindings
         self.view.fileMenu.entryconfig(1, command=self.new)
         self.view.fileMenu.entryconfig(2, command=self.open)
+        self.view.fileMenu.entryconfig(6, command=self.save)
         self.view.fileMenu.entryconfig(9, command=self.quit)
         self.view.toolMenu.entryconfig(1, command=self.import_statements)
         self.view.toolMenu.entryconfig(2, command=self.editAccounts)
@@ -37,15 +38,16 @@ class Gui(object):
         #add callbacks
         self.Accounts.model.addCallback(self.logger)
         self.Wallets.model.addCallback(self.logger)
+        self.Data.model.addCallback(self.logger)
         self.Accounts.model.addCallback(self.unsaved)
         self.Wallets.model.addCallback(self.unsaved)
         self.Data.model.addCallback(self.unsaved)
     
     def logger(self, event):
-        print event
+        print event.head()
         #print self.Accounts.model.data
         
-    def unsaved(self):
+    def unsaved(self, event):
         #put asterix in title to show not saved
         self.view.title('Python-Wallets (**unsaved)')
 
@@ -68,6 +70,7 @@ class Gui(object):
         self.h5db = asksaveasfilename(**options)
         self.import_accounts()
         self.import_wallets()
+        self.import_statements()
 
     def open(self):
         ''' 
@@ -116,11 +119,8 @@ class Gui(object):
             _data['account'] = accountname
             _data = _data.drop('null', 1)
             self.Data.set(_data)
+            print self.Data.model.data.head()
             
-            
-            
-        #append account to new column
-        #append dataframe to Data
         #run duplicate removal tool
         #run wallet parser
 
@@ -172,6 +172,13 @@ class Gui(object):
         store['data'] = self.Data.model.data
         self.view.title('Python-Wallets')
 
+    def remove_duplicates(self):
+        pass
+    
+    def parse_wallets(self):
+        pass
+    
+    
 def main():
     root = Tk()
     root.withdraw()
