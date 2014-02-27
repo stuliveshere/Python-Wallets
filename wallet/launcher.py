@@ -5,6 +5,7 @@ import sys
 from view import *
 from model import *
 import os
+import numpy as np
 
 class StdoutRedirector(object):
     def __init__(self,text_widget):
@@ -28,24 +29,30 @@ class Gui(object):
         self.view.fileMenu.entryconfig(6, command=self.save)
         self.view.fileMenu.entryconfig(9, command=self.quit)
         self.view.toolMenu.entryconfig(1, command=self.import_statements)
-        self.view.toolMenu.entryconfig(2, command=self.editAccounts)
-        self.view.toolMenu.entryconfig(3, command=self.editWallets)
+        self.view.toolMenu.entryconfig(2, command=self.parse_wallets)
+        self.view.toolMenu.entryconfig(3, command=self.remove_duplicates)
+        self.view.toolMenu.entryconfig(4, command=self.editAccounts)
+        self.view.toolMenu.entryconfig(5, command=self.editWallets)
         #model
         self.h5db = None
-        self.Data = Model(columns=['data', 'amount', 'desc', 'account', 'wallet'])
+        self.Data = Model(columns=['date', 'amount', 'desc', 'account', 'wallet'])
         self.Accounts = Model(columns=['account', 'desc'])
         self.Wallets = Model(columns=['wallet', 'keys'])
         #add callbacks
         self.Accounts.model.addCallback(self.logger)
         self.Wallets.model.addCallback(self.logger)
         self.Data.model.addCallback(self.logger)
+        self.Data.model.addCallback(self.summary)
         self.Accounts.model.addCallback(self.unsaved)
         self.Wallets.model.addCallback(self.unsaved)
         self.Data.model.addCallback(self.unsaved)
     
     def logger(self, event):
-        print event.head()
+        print event.head(20)
         #print self.Accounts.model.data
+        
+    def summary(self, event):
+        self.view.summary.draw(event)
         
     def unsaved(self, event):
         #put asterix in title to show not saved
@@ -115,11 +122,14 @@ class Gui(object):
             #parse filename to find out the account
             accountname =  accountlist[[i for i, x in enumerate(accountlist) if x in _file][0]]
             #read in csv to dataframe
-            _data = pd.read_csv(_file, header=None, names=['data', 'amount', 'desc', 'null'])
+            _data = pd.read_csv(_file, header=None, names=['date', 'amount', 'desc', 'null'])
             _data['account'] = accountname
+            _data['wallet'] = 'unallocated'
             _data = _data.drop('null', 1)
+            _data.date = pd.to_datetime(_data.date, dayfirst=True) #reformat date column
+            _data = _data.set_index('date', drop=False)
             self.Data.set(_data)
-            print self.Data.model.data.head()
+
             
         #run duplicate removal tool
         #run wallet parser
@@ -173,10 +183,28 @@ class Gui(object):
         self.view.title('Python-Wallets')
 
     def remove_duplicates(self):
-        pass
+        ''' the problem is entries within a sheet dont have to be unique.'''
+        
+        print self.Data.model.data.count()
+        dups = self.Data.model.data.duplicated()
+        print self.Data.model.data[dups]
+        self.Data.model.data = self.Data.model.data.drop_duplicates()
+        print self.Data.model.data.count()
+       
     
     def parse_wallets(self):
-        pass
+        for index,row in self.Wallets.model.data.iterrows():
+            keys = filter(bool, row['keys'])
+            reg = '|'.join(keys)
+            bools =  self.Data.model.data.desc.str.contains(reg)
+            self.Data.model.data['wallet'][bools] = row['wallet']
+        self.save()
+        
+        for key, grp in self.Data.model.data.groupby(['wallet']):
+            rows = np.random.choice(grp.index.values, 20)
+            print grp.ix[rows].drop_duplicates()
+
+
     
     
 def main():

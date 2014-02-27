@@ -1,6 +1,13 @@
 from Tkinter import *
 from ttk import *
 import tkFont
+import matplotlib
+matplotlib.use('TkAgg')
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg as Tkcanvas
+from matplotlib.backends.backend_tkagg import NavigationToolbar2TkAgg as Tktoolbar
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as pylab
 
 class Wizard(object,Notebook):
     ''' from https://code.google.com/p/python-ttk/wiki/ttkWizard'''
@@ -104,7 +111,7 @@ class GuiView(Toplevel):
         notebook.enable_traversal()  
         notebook.pack(fill='both', expand=Y, padx=5, pady=5)
         self.log = View_Log(notebook)
-        View_Config(notebook)
+        self.summary = View_Summary(notebook)
         
 
     def _menu(self):
@@ -124,6 +131,8 @@ class GuiView(Toplevel):
         self.toolMenu = Menu(self.menuBar)
         self.menuBar.add_cascade(label="Tools", menu=self.toolMenu)
         self.toolMenu.add_command(label="Import statements...")
+        self.toolMenu.add_command(label="Parse Wallets...")
+        self.toolMenu.add_command(label="Remove Duplicates...")
         self.toolMenu.add_command(label="Edit accounts...")
         self.toolMenu.add_command(label="Edit wallets...")
         self.helpMenu = Menu(self.menuBar)
@@ -131,11 +140,24 @@ class GuiView(Toplevel):
         self.helpMenu.add_command(label="About")
     
 
-class View_Config():
+class View_Summary():
     def __init__(self, parent):
         self.parent = parent
         self.frame = Frame(parent)
-        self.view = parent.add(self.frame, text='Configure')
+        self.view = parent.add(self.frame, text='Summary')
+        self.f = pylab.figure(figsize=(10,8), dpi=100)
+        self.a = self.f.add_subplot(111)
+        self.canvas = Tkcanvas(self.f, master=self.frame)
+        self.canvas.get_tk_widget().pack(side=TOP, fill=BOTH, expand=1)
+
+
+    def draw(self, dataset):
+        
+        t = np.arange(0.0,3.0,0.01)
+        s = np.sin(2*np.pi*t)
+        self.a.plot(t,s)
+        self.f.tight_layout()
+        self.canvas.show()
         
 class View_Log():
     def __init__(self, parent):
