@@ -48,8 +48,8 @@ class Gui(object):
         self.Data.model.addCallback(self.unsaved)
     
     def logger(self, event):
-        print event.head(20)
-        #print self.Accounts.model.data
+        rows = np.random.choice(event.index.values, 20)
+        print event.ix[rows]
         
     def summary(self, event):
         self.view.summary.draw(event)
@@ -141,7 +141,7 @@ class Gui(object):
         options = {
         'defaultextension': '.csv',
         'filetypes': [('csv', '.csv')],
-        'initialdir': '../',
+        'initialdir': '../data/',
         'initialfile': None,
         'multiple': 0,
         'parent': self.parent,
@@ -156,7 +156,7 @@ class Gui(object):
         options = {
         'defaultextension': '.csv',
         'filetypes': [('csv', '.csv')],
-        'initialdir': '../',
+        'initialdir': '../data/wallets/',
         'initialfile': None,
         'multiple': 1,
         'parent': self.parent,
@@ -201,10 +201,7 @@ class Gui(object):
         self.Data.model.data = self.Data.model.data.sort(columns=['date'], ascending=False)
         self.save()
         
-        print self.Data.model.data.head(20)
-        for key, grp in self.Data.model.data.groupby(['wallet']):
-            rows = np.random.choice(grp.index.values, 20)
-            #print grp.ix[rows].drop_duplicates()
+
 
 
     

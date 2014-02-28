@@ -149,30 +149,54 @@ class View_Summary():
         self.axes = {'veridian':self.fig.add_subplot(411),
                      'mastercard':self.fig.add_subplot(412),
                      'visa':self.fig.add_subplot(413),
-                     'savings':self.fig.add_subplot(414),}
+                     }
+        self.total = self.fig.add_subplot(414)
         self.canvas = Tkcanvas(self.fig, master=self.frame)
         self.canvas.get_tk_widget().pack(side=TOP, fill=BOTH, expand=1)
 
 
     def draw(self, dataset):
         for key in self.axes.keys():
-            
-            f = dataset[dataset.account == key]
-            f = f.set_index(keys='date')
-            f = f['2013-07-01':'2014-2-28']
-            f = f.amount
-            f.columns = ['amount']
-            rng = pd.date_range(start='2013-07-01', end='2014-2-28', freq='D')
-            df = pd.DataFrame(pd.Series(0, index=rng), index=rng)
+            self.axes[key].cla()
+            rng = pd.date_range(start='2013-07-01', end='2014-03-01', freq='D')
+            df = dataset[dataset.account == key]
+            df = df.set_index(keys='date')
+            df = df.amount
+            df = df.sort_index()
+            df = pd.DataFrame(df)
+            df['time'] = df.index
+            mask = (df.time-df.time.shift()) == np.timedelta64(0,'s')
+            for index, entry in enumerate(mask):
+                if entry:
+                    df.time.iloc[index] += pd.offsets.Milli(index)
+            df = df.set_index(keys='time')
+            df = df.amount
             df.columns = ['amount']
-            #df = df.set_index(keys='date')
-            print df.head()
-            print f.head()
-            df = df.append(f)
-            df = df.groupby(df.index).sum()
-            df = df.cumsum()
-            print df.head()
-            #df['2013-01-31':'2014-01-31'].plot(ax=self.axes[key], title=key)
+            df = df.cumsum().astype(np.float)
+
+
+            df = df.reindex(index=rng, method='pad', fill_value=None)
+            df -= df.dropna().iget(0)
+            df.plot(ax=self.axes[key], title=key)
+        
+        self.total.cla()
+        df = dataset
+        df = df.set_index(keys='date')
+        df = df.amount
+        df = df.sort_index()
+        df = pd.DataFrame(df)
+        df['time'] = df.index
+        mask = (df.time-df.time.shift()) == np.timedelta64(0,'s')
+        for index, entry in enumerate(mask):
+            if entry:
+                df.time.iloc[index] += pd.offsets.Milli(index)
+        df = df.set_index(keys='time')
+        df = df.amount
+        df.columns = ['amount']
+        df = df.cumsum().astype(np.float)
+        df = df.reindex(index=rng, method='pad', fill_value=None)
+        df -= df.iloc[0]
+        df.plot(ax=self.total, title='total')        
         self.fig.tight_layout()
         self.canvas.show()
         
