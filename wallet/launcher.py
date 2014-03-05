@@ -43,6 +43,7 @@ class Gui(object):
         self.Wallets.model.addCallback(self.logger)
         self.Data.model.addCallback(self.logger)
         self.Data.model.addCallback(self.summary)
+        self.Data.model.addCallback(self.draw_wallets)
         self.Accounts.model.addCallback(self.unsaved)
         self.Wallets.model.addCallback(self.unsaved)
         self.Data.model.addCallback(self.unsaved)
@@ -53,6 +54,9 @@ class Gui(object):
         
     def summary(self, event):
         self.view.summary.draw(event)
+        
+    def draw_wallets(self, event):
+        self.view.wallets.draw(event)
         
     def unsaved(self, event):
         #put asterix in title to show not saved

@@ -112,6 +112,7 @@ class GuiView(Toplevel):
         notebook.pack(fill='both', expand=Y, padx=5, pady=5)
         self.log = View_Log(notebook)
         self.summary = View_Summary(notebook)
+        self.wallets = View_Wallets(notebook)
         
 
     def _menu(self):
@@ -140,11 +141,32 @@ class GuiView(Toplevel):
         self.helpMenu.add_command(label="About")
     
 
+class View_Wallets():
+    def __init__(self, parent):
+        self.parent = parent
+        self.frame = Frame(parent)
+        self.view = parent.add(self.frame, text='Wallets')
+        self.notebook = Notebook(self.frame)
+        self.notebook.enable_traversal()  
+        self.notebook.pack(fill='both', expand=Y, padx=5, pady=5)
+
+    def draw(self, data):
+        wallets = data.wallet.unique()
+        pages = {}
+        for wallet in wallets:
+            pages[wallet] = View_Pages(wallet, self.notebook)
+            
+class View_Pages():
+    def __init__(self, wallet, parent):
+        self.parent = parent
+        self.frame = Frame(parent)
+        self.view = parent.add(self.frame, text=wallet)
+
 class View_Summary():
     def __init__(self, parent):
         self.parent = parent
         self.frame = Frame(parent)
-        self.view = parent.add(self.frame, text='Summary')
+        self.view = parent.add(self.frame, text='Account Summary')
         self.fig = pylab.figure(figsize=(10,8), dpi=100)
         self.axes = {'veridian':self.fig.add_subplot(411),
                      'mastercard':self.fig.add_subplot(412),
@@ -199,7 +221,8 @@ class View_Summary():
         df.plot(ax=self.total, title='total')        
         self.fig.tight_layout()
         self.canvas.show()
-        
+
+       
 class View_Log():
     def __init__(self, parent):
         self.parent = parent
