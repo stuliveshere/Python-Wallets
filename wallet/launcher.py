@@ -7,6 +7,8 @@ from model import *
 import os
 import numpy as np
 
+verbose = 0
+
 class StdoutRedirector(object):
     def __init__(self,text_widget):
         self.text_space = text_widget
@@ -49,8 +51,9 @@ class Gui(object):
         self.Data.model.addCallback(self.unsaved)
     
     def logger(self, event):
-        rows = np.random.choice(event.index.values, 20)
-        print event.ix[rows]
+        if verbose:
+            rows = np.random.choice(event.index.values, 20)
+            print event.ix[rows]
         
     def summary(self, event):
         self.view.summary.draw(event)

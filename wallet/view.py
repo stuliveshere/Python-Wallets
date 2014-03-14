@@ -8,6 +8,7 @@ from matplotlib.backends.backend_tkagg import NavigationToolbar2TkAgg as Tktoolb
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as pylab
+import datetime as dt 
 
 class Wizard(object,Notebook):
     ''' from https://code.google.com/p/python-ttk/wiki/ttkWizard'''
@@ -112,6 +113,7 @@ class GuiView(Toplevel):
         notebook.pack(fill='both', expand=Y, padx=5, pady=5)
         self.log = View_Log(notebook)
         self.summary = View_Summary(notebook)
+        self.walletsummary = View_Wallet_Summary(notebook)
         self.wallets = View_Wallets(notebook)
         
 
@@ -156,6 +158,19 @@ class View_Wallets():
         for wallet in wallets:
             pages[wallet] = View_Pages(wallet, self.notebook)
             
+class View_Wallet_Summary():
+    def __init__(self, parent):
+        self.parent = parent
+        self.frame = Frame(parent)
+        self.view = parent.add(self.frame, text='Wallet Summary')
+        self.notebook = Notebook(self.frame)
+        self.notebook.enable_traversal()  
+        self.notebook.pack(fill='both', expand=Y, padx=5, pady=5) 
+        
+    def draw(self):
+        pass          
+
+            
 class View_Pages():
     def __init__(self, wallet, parent):
         self.parent = parent
@@ -180,30 +195,20 @@ class View_Summary():
     def draw(self, dataset):
         for key in self.axes.keys():
             self.axes[key].cla()
-            rng = pd.date_range(start='2013-07-01', end='2014-03-01', freq='D')
             df = dataset[dataset.account == key]
-            df = df.set_index(keys='date')
-            df = df.amount
-            df = df.sort_index()
-            df = pd.DataFrame(df)
-            df['time'] = df.index
-            mask = (df.time-df.time.shift()) == np.timedelta64(0,'s')
-            for index, entry in enumerate(mask):
-                if entry:
-                    df.time.iloc[index] += pd.offsets.Milli(index)
-            df = df.set_index(keys='time')
-            df = df.amount
-            df.columns = ['amount']
-            df = df.cumsum().astype(np.float)
-
-
-            df = df.reindex(index=rng, method='pad', fill_value=None)
-            df -= df.dropna().iget(0)
+            df = self.parse(df)
             df.plot(ax=self.axes[key], title=key)
-        
+
         self.total.cla()
-        df = dataset
-        df = df.set_index(keys='date')
+        df = self.parse(dataset)
+        df.plot(ax=self.total, title='total')
+        self.fig.tight_layout()
+        self.canvas.show()
+        
+    def parse(self, series):
+        today = dt.date.today()
+        rng = pd.date_range(start='2013-07-01', end=today, freq='D')
+        df = series.set_index(keys='date')
         df = df.amount
         df = df.sort_index()
         df = pd.DataFrame(df)
@@ -211,16 +216,15 @@ class View_Summary():
         mask = (df.time-df.time.shift()) == np.timedelta64(0,'s')
         for index, entry in enumerate(mask):
             if entry:
-                df.time.iloc[index] += pd.offsets.Milli(index)
+                df.time.iloc[index] += pd.offsets.Second(index)
         df = df.set_index(keys='time')
         df = df.amount
         df.columns = ['amount']
         df = df.cumsum().astype(np.float)
         df = df.reindex(index=rng, method='pad', fill_value=None)
-        df -= df.iloc[0]
-        df.plot(ax=self.total, title='total')        
-        self.fig.tight_layout()
-        self.canvas.show()
+        df -= df.dropna().iloc[0]
+        return df
+
 
        
 class View_Log():
